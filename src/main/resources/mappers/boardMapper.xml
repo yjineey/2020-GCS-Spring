@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="board">
+
+	<!-- 掲示物リスト照会 -->
+	<select id="listAll"
+		resultType="com.example.spring02.model.board.dto.BoardVO">
+		SELECT *
+		FROM
+		tbl_board
+		WHERE del_cd ='0'
+		ORDER BY
+		bno desc
+	</select>
+	
+	<!-- 掲示物作成 -->
+	<insert id="insert">
+		INSERT
+		INTO tbl_board (
+		bno,
+		title,
+		content,
+		writer,
+		del_cd
+		) VALUES (
+		(SELECT NVL(MAX(bno)+1, 1)FROM tbl_board),
+		#{title},
+		#{content},
+		#{writer},
+		0
+		)
+	</insert>
+	
+	<!-- 掲示物照会数追加 -->
+	<update id="increaseViewcnt">
+		UPDATE tbl_board SET viewcnt = viewcnt + 1
+		WHERE bno = #{bno} and del_cd=0
+	</update>
+	
+	<!-- 掲示物詳細照会 -->
+	<select id="view"
+		resultType="com.example.spring02.model.board.dto.BoardVO">
+		SELECT * FROM tbl_board
+		WHERE bno = #{bno} and del_cd=0
+	</select>
+	
+	<!-- 掲示物修正 -->
+	<update id="updateArticle">
+		UPDATE tbl_board
+		SET
+		title = #{title},
+		content = #{content},
+		upd_id = #{upd_id},
+		upd_date= SYSDATE
+		WHERE bno = #{bno} and del_cd=0
+	</update>
+	
+	<!-- 掲示物削除check -->
+    <select id="updatecheck" resultType="int">
+        SELECT count(*) 
+        FROM tbl_board 
+        WHERE
+        bno = #{bno} AND del_cd=0
+    </select>
+    
+	<!--掲示物削除 -->
+	<update id="deleteArticle" >
+		UPDATE tbl_board
+		SET del_cd = 1
+		WHERE bno = #{bno} and del_cd = 0
+	</update>
+	
+</mapper>
